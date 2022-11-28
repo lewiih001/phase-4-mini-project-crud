@@ -6,7 +6,7 @@ class SpicesController < ApplicationController
       end
   
       def create
-          spice = Spice.create(spices_params)
+          spice = Spice.create(spice_params)
           render json: spice, status: :created
       end
   
