@@ -1,50 +1,41 @@
 class SpicesController < ApplicationController
-
-    def index
-        spices = Spice.all
-        render json: spices
-      end
-
-    def show
-        spice = Spice.find_by(id: params[:id])
-        if spice
-          render json: spice
-        else
-          render json: { error: "spice not found" }, status: :not_found
-        end
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found_response
+  
+      def index
+          render json: Spice.all
       end
   
-    # POST /spices
-    def create
-      spice = Spice.create(spice_params)
-      render json: spice, status: :created
-    end
-
-    def update
-        spice = Spice.find_by(id: params[:id])
-        if spice
-          spice.update(spice_params)
-          render json: spice
-        else
-          render json: { error: "spice not found" }, status: :not_found
-        end
+      def create
+          spice = Spice.create(spice_params)
+          render json: spice, status: :created
       end
-
-    def destroy
-        spice = Spice.find_by(id: params[:id])
-        if spice
+  
+      def update
+          spice = find_spice
+          spice.update(spices_params)
+          render json: spice
+      end
+  
+      def destroy
+          spice = find_spice
           spice.destroy
           head :no_content
-        else
-          render json: { error: "spice not found" }, status: :not_found
-        end
+      end
+
+      
+  
+      private
+  
+      def spices_params
+          params.permit(:title, :image, :description, :notes, :rating)
       end
   
-    private
+      def find_spice
+          Spice.find_by(params[:id])
+      end
   
-    def spice_params
-      params.permit(:title, :image, :description, :notes,:rating)
-    end
+      def render_not_found_response
+          render json: { error: 'No spice found' }, sratus: 404
+      end
   
- 
-end
+  end
